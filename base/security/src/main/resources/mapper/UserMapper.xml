@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.longsan.dao.mapper.UserMapper">
+    <select id="selectUserByUserName" resultType="com.longsan.domain.bo.UserInfo">
+        select u.user_id,
+               u.dept_id,
+               u.user_name,
+               u.nick_name,
+               u.email,
+               u.avatar,
+               u.phone_number,
+               u.password,
+               u.sex,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.create_time,
+               u.remark,
+               r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.data_scope,
+               r.status as role_status
+        from sys_user u
+                 left join sys_user_role ur on u.user_id = ur.user_id
+                 left join sys_role r on r.role_id = ur.role_id
+        where u.user_name = #{userName}
+    </select>
+    <select id="findUserPermissions" resultType="java.lang.String">
+        select sm.perms
+        from sys_user u
+                 left join sys_user_role sur on u.user_id = sur.user_id
+                 left join sys_role sr on sur.role_id = sr.role_id
+                 left join sys_role_menu srm on sr.role_id = srm.role_id
+                 left join sys_menu sm on srm.menu_id = sm.menu_id
+        where u.user_id = #{id}
+    </select>
+</mapper>
