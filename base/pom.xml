@@ -15,6 +15,7 @@
         <module>nacos</module>
         <module>mybatis</module>
         <module>security</module>
+        <module>elasticsearch</module>
     </modules>
 
     <properties>
