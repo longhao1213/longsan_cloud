@@ -33,6 +33,7 @@
         <docker.image.prefix>longsan-cloud</docker.image.prefix>
         <spring.cloud.version>2021.0.4</spring.cloud.version>
         <alibaba.cloud.version>2021.0.4.0</alibaba.cloud.version>
+        <commons.lang3.version>3.11</commons.lang3.version>
     </properties>
 
     <dependencies>
@@ -50,6 +51,11 @@
     <!--锁定版本-->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>

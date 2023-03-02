@@ -1,7 +1,8 @@
 import com.longsan.es.EsApplication;
 import com.longsan.es.User;
-import com.longsan.es.service.ElasticsearchService;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,6 @@ import java.util.List;
 @SpringBootTest(classes = EsApplication.class)
 public class EsTest {
 
-    @Autowired
-    private ElasticsearchService elasticsearchService;
 
     @Autowired
     private ElasticsearchRestTemplate restTemplate;
@@ -188,6 +187,23 @@ public class EsTest {
         System.out.println(search.getTotalHits());
         search.getSearchHits().forEach(list->{
             System.out.println(list.getContent());
+        });
+    }
+
+    /**
+     * 多条件查询
+     */
+    @Test
+    public void querysSearch() {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        List<QueryBuilder> list = new ArrayList<>();
+        list.add(QueryBuilders.matchQuery("name","张三"));
+        list.add(QueryBuilders.matchQuery("age","23"));
+        boolQueryBuilder.must().addAll(list);
+        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(boolQueryBuilder);
+        SearchHits<User> search = restTemplate.search(nativeSearchQuery, User.class);
+        search.getSearchHits().forEach(t->{
+            System.out.println(t);
         });
     }
 

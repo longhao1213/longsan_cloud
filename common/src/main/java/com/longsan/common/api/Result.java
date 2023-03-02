@@ -3,8 +3,6 @@ package com.longsan.common.api;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.longsan.common.constant.CommonConstant;
 import com.longsan.common.exception.ApiException;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.Getter;
 
@@ -17,21 +15,16 @@ import java.io.Serializable;
  */
 @Data
 @Getter
-@ApiModel(value = "统一响应消息报文")
 public class Result<T> implements Serializable,IResultCode {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "状态码", required = true)
     private int code;
 
-    @ApiModelProperty(value = "消息内容", required = true)
     private String msg;
 
-    @ApiModelProperty(value = "时间戳", required = true)
     private long time;
 
-    @ApiModelProperty(value = "业务数据")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
