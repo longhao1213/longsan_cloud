@@ -18,6 +18,7 @@ import io.minio.RemoveBucketArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.UploadObjectArgs;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
@@ -338,11 +339,33 @@ public class MinioUtils {
      */
     @SneakyThrows(Exception.class)
     public String getFileStatusInfo(String bucketName, String objectName) {
-        return minioClient.statObject(
+        StatObjectResponse statObjectResponse = minioClient.statObject(
                 StatObjectArgs.builder()
                         .bucket(bucketName)
                         .object(objectName)
-                        .build()).toString();
+                        .build());
+        return statObjectResponse.toString();
+    }
+
+    /**
+     * 获取文件信息, 如果抛出异常则说明文件不存在
+     *
+     * @param bucketName 存储桶
+     * @param objectName 文件名称
+     * @return
+     */
+    public MinioFileBo getFileInfo(String bucketName, String objectName) {
+        try {
+            StatObjectResponse statObjectResponse = minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build());
+            return MinioFileBo.get(statObjectResponse);
+        } catch (Exception e) {
+            log.info("文件不存在！{}",objectName);
+            return null;
+        }
     }
 
     /**

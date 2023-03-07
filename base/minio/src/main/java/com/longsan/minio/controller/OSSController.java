@@ -2,6 +2,7 @@ package com.longsan.minio.controller;
 
 import com.longsan.minio.config.MinioConfig;
 import com.longsan.minio.utils.MinioUtils;
+import io.minio.ObjectWriteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -41,7 +42,7 @@ public class OSSController {
             String newFileName = System.currentTimeMillis() + "." + StringUtils.substringAfterLast(fileName, ".");
             //类型
             String contentType = file.getContentType();
-            minioUtils.uploadFile(minioConfig.getBucketName(), file, newFileName, contentType);
+            ObjectWriteResponse objectWriteResponse = minioUtils.uploadFile(minioConfig.getBucketName(), file, newFileName, contentType);
             return "上传成功";
         } catch (Exception e) {
             log.error("上传失败");
