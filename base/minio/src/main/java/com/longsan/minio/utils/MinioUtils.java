@@ -3,7 +3,11 @@ package com.longsan.minio.utils;
 import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.net.URLDecoder;
+import com.longsan.minio.config.MinioConfig;
+import com.longsan.minio.config.ThreadPoolTaskConfig;
 import io.minio.BucketExistsArgs;
+import io.minio.ComposeObjectArgs;
+import io.minio.ComposeSource;
 import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
 import io.minio.GetBucketPolicyArgs;
@@ -16,22 +20,30 @@ import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveBucketArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.UploadObjectArgs;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
+import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -41,6 +53,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author longhao
@@ -288,11 +301,20 @@ public class MinioUtils {
      * @return
      */
     @SneakyThrows
-    public ObjectWriteResponse uploadFile(String bucketName, String objectName, String fileName) {
-        return minioClient.uploadObject(
-                UploadObjectArgs.builder().bucket(bucketName).object(objectName)
+    public String uploadFile(String bucketName, String objectName, String fileName) {
+        String fileMd5 = DigestUtils.md5Hex(new BufferedInputStream(new FileInputStream(fileName)));
+        // 创建文件md5名称
+        String md5Name = fileMd5 + fileName.substring(fileName.lastIndexOf("."));
+        // 判断文件是否已经存在
+        MinioFileBo fileInfo = getFileInfo(bucketName, md5Name);
+        if (fileInfo != null) {
+            return createFilePath(bucketName, md5Name);
+        }
+        minioClient.uploadObject(
+                UploadObjectArgs.builder().bucket(bucketName).object(md5Name)
                         .filename(fileName).build()
         );
+        return createFilePath(bucketName, md5Name);
     }
 
     /**
@@ -363,7 +385,7 @@ public class MinioUtils {
                             .build());
             return MinioFileBo.get(statObjectResponse);
         } catch (Exception e) {
-            log.info("文件不存在！{}",objectName);
+            log.info("文件不存在！{}", objectName);
             return null;
         }
     }
@@ -400,6 +422,7 @@ public class MinioUtils {
                         .object(objectName)
                         .build());
     }
+
 
     /**
      * 批量删除文件
@@ -461,4 +484,128 @@ public class MinioUtils {
         String url = str.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
         return URLDecoder.decode(url, Charset.forName("utf-8"));
     }
+
+    private final ThreadPoolTaskConfig threadPoolTaskConfig;
+
+    /**
+     * 多线程对已经分片的文件进行上传
+     * @param bucketName
+     * @param folder
+     * @param fileMd5
+     * @throws FileNotFoundException
+     * @throws InterruptedException
+     */
+    public void chunkUpload(String bucketName, String folder, String fileMd5) throws FileNotFoundException, InterruptedException {
+        // 判断分片bucket是否存在，不存在就创建
+        createBucket(fileMd5);
+        // 获取已经分片的文件夹
+        File fileFolder = new File(folder);
+        // 初始化计时器
+        CountDownLatch cdl = new CountDownLatch(fileFolder.listFiles().length);
+        ThreadPoolTaskExecutor executor = threadPoolTaskConfig.threadPoolTaskExecutor();
+        System.out.println("====== 线程开始 =====");
+        for (File file : fileFolder.listFiles()) {
+            // 开启线程
+            executor.execute(() -> {
+                try {
+                    uploadFile(fileMd5, file.getName(), new FileInputStream(file));
+                    System.out.println("上传一个分片");
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                // 闭锁-1
+                cdl.countDown();
+            });
+        }
+        // 调用闭锁的await()方法，该线程会被挂起，它会等待直到count值为0才继续执行
+        // 这样我们就能确保上面多线程都执行完了才走后续代码
+        cdl.await();
+        //关闭线程池
+        executor.shutdown();
+        System.out.println("====== 线程结束 =====");
+    }
+
+    @SneakyThrows
+    public void chunkCompose(String bucketName,String md5,String fileName) {
+        Iterable<Result<Item>> listObject = listObject(md5, "", false);
+        List<String> objectNameList = new ArrayList<>();
+        for (Result<Item> result : listObject) {
+            Item item = result.get();
+            objectNameList.add(item.objectName());
+        }
+        // 对文件名集合进行升序排序
+        objectNameList.sort((o1, o2) -> Integer.parseInt(o2.substring(o2.lastIndexOf("/") + 1, o2.lastIndexOf("."))) > Integer.parseInt(o1.substring(o1.lastIndexOf("/") + 1, o1.lastIndexOf("."))) ? -1 : 1);
+        List<ComposeSource> composeSourceList = new ArrayList<>(objectNameList.size());
+        //合并文件
+        for (String object : objectNameList) {
+            composeSourceList.add(ComposeSource.builder()
+                    .bucket(md5)
+                    .object(object)
+                    .build());
+        }
+        minioClient.composeObject(ComposeObjectArgs.builder()
+                .bucket(bucketName)
+                .object(fileName)
+                .sources(composeSourceList)
+                .build());
+        // 删除分片bucket
+        deleteHasFileBucket(md5);
+    }
+
+    /**
+     * 删除含有文件的bucket
+     * 先删除文件，再删除bucket
+     * @param bucketName
+     */
+    @SneakyThrows
+    public void deleteHasFileBucket(String bucketName) {
+        Iterable<Result<Item>> listObject = listObject(bucketName, "", true);
+        List<DeleteObject> removeFiles = new LinkedList<>();
+        for (Result<Item> result : listObject) {
+            removeFiles.add(new DeleteObject(result.get().objectName()));
+        }
+        Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs.builder()
+                .bucket(bucketName)
+                .objects(removeFiles)
+                .build());
+        for (Result<DeleteError> result : results) {
+            DeleteError error = result.get();
+            log.error("Error in deleting object " + error.objectName() + "; " + error.message());
+        }
+        removeBucket(bucketName);
+    }
+
+    /**
+     * 分片上传文件 上传合并集合一体
+     * @param bucketName
+     * @param filePath 文件全路径
+     * @param fileName 文件名称
+     * @param singleSize 分片大小
+     */
+    @SneakyThrows
+    public String chunkUploadAndCompose(String bucketName,String filePath,String fileName,int singleSize) {
+        String fileMd5 = DigestUtils.md5Hex(new BufferedInputStream(new FileInputStream(filePath)));
+        // 创建文件md5名称
+        String md5Name = fileMd5 + fileName.substring(fileName.lastIndexOf("."));
+        // 判断文件是否已经存在
+        MinioFileBo fileInfo = getFileInfo(bucketName, md5Name);
+        if (fileInfo != null) {
+            return createFilePath(bucketName, md5Name);
+        }
+        String folder = FileUtils.cutFile(filePath, fileName, singleSize);
+        // 上传
+        chunkUpload(bucketName, folder, fileMd5);
+
+        // 合并
+        chunkCompose(bucketName, fileMd5, md5Name);
+        return createFilePath(bucketName, md5Name);
+    }
+
+    private final MinioConfig minioConfig;
+
+    public String createFilePath(String bucketName ,String fileName) {
+        return minioConfig.getEndpoint() + "/" + bucketName + "/" + fileName;
+    }
+
+
 }
