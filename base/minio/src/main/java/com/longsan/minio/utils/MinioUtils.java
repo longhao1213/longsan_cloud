@@ -75,10 +75,12 @@ public class MinioUtils {
      * @param bucketName
      */
     @SneakyThrows
-    private void createBucket(String bucketName) {
+    private boolean createBucket(String bucketName) {
         if (!bucketExists(bucketName)) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            return false;
         }
+        return true;
     }
 
     /**
@@ -496,10 +498,25 @@ public class MinioUtils {
      * @throws InterruptedException
      */
     public void chunkUpload(String bucketName, String folder, String fileMd5) throws FileNotFoundException, InterruptedException {
-        // 判断分片bucket是否存在，不存在就创建
-        createBucket(fileMd5);
         // 获取已经分片的文件夹
         File fileFolder = new File(folder);
+
+        // 判断分片bucket是否存在，不存在就创建
+        if (createBucket(fileMd5)) {
+            // bucket已经存在，判断分片文件是否已经全部存在
+            int fileSize = fileFolder.listFiles().length;
+            Iterable<Result<Item>> listObject = listObject(fileMd5, "", false);
+            int length=0;
+            for (Result<Item> result : listObject) {
+                length++;
+            }
+            if (length == fileSize) {
+                deleteFolder(fileFolder);
+                // 分片文件已经存在，直接返回
+                log.info("分片文件已经存在，直接返回");
+                return;
+            }
+        }
         // 初始化计时器
         CountDownLatch cdl = new CountDownLatch(fileFolder.listFiles().length);
         ThreadPoolTaskExecutor executor = threadPoolTaskConfig.threadPoolTaskExecutor();
@@ -524,6 +541,10 @@ public class MinioUtils {
         executor.shutdown();
         System.out.println("====== 线程结束 =====");
         // 删除分片生成的文件夹
+        deleteFolder(fileFolder);
+    }
+
+    private static void deleteFolder(File fileFolder) {
         if (fileFolder.isDirectory()) {
             for (File listFile : fileFolder.listFiles()) {
                 listFile.delete();

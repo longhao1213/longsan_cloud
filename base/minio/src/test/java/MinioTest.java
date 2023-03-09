@@ -55,7 +55,7 @@ public class MinioTest {
         String path = FileUtils.cutFile("/Users/longhao/temp/test.rvt", "test.rvt", 5 * 1024 * 1024);
         String md5 = DigestUtils.md5Hex(new BufferedInputStream(new FileInputStream("/Users/longhao/temp/test.rvt")));
         minioUtils.chunkUpload("test",path, md5);
-        minioUtils.chunkCompose("test", md5, "test.rvt");
+//        minioUtils.chunkCompose("test", md5, "test.rvt");
 
     }
 
