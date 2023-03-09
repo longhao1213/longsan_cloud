@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -88,6 +89,17 @@ public class MinioTest {
     public void test5() {
         String test = minioUtils.uploadFile("test", "1.jpg","/Users/longhao/temp/1.jpg");
         System.out.println(test);
+    }
+
+    public static void main(String[] args) {
+        File file = new File("/Users/longhao/temp/test");
+        if (file.isDirectory()) {
+            for (File listFile : file.listFiles()) {
+                listFile.delete();
+            }
+        }
+        boolean delete = file.delete();
+        System.out.println(delete);
     }
 
 

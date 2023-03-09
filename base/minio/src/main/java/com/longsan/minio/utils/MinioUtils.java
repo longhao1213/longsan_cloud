@@ -523,6 +523,13 @@ public class MinioUtils {
         //关闭线程池
         executor.shutdown();
         System.out.println("====== 线程结束 =====");
+        // 删除分片生成的文件夹
+        if (fileFolder.isDirectory()) {
+            for (File listFile : fileFolder.listFiles()) {
+                listFile.delete();
+            }
+        }
+        fileFolder.delete();
     }
 
     @SneakyThrows
