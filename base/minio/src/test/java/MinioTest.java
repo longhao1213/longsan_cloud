@@ -91,6 +91,11 @@ public class MinioTest {
         System.out.println(test);
     }
 
+    @Test
+    public void test6() {
+        minioUtils.removeBucket("test");
+    }
+
     public static void main(String[] args) {
         File file = new File("/Users/longhao/temp/test");
         if (file.isDirectory()) {

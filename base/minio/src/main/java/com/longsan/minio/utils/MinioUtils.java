@@ -22,6 +22,7 @@ import io.minio.RemoveBucketArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
+import io.minio.SetBucketPolicyArgs;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.UploadObjectArgs;
@@ -55,6 +56,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
+import static com.longsan.minio.config.MinioConfig.BUCKET_PARAM;
+
 /**
  * @author longhao
  * @since 2023/3/2
@@ -81,6 +84,19 @@ public class MinioUtils {
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * 修改bucket策略
+     * @param bucketName
+     */
+    @SneakyThrows
+    public void setBucket(String bucketName,String policy) {
+        minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+                .bucket(bucketName)
+                .config(policy.replace(BUCKET_PARAM, bucketName))
+                .build());
     }
 
     /**

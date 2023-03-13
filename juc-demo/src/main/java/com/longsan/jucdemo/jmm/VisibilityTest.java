@@ -35,7 +35,7 @@ public class VisibilityTest {
             // 5:发放线程许可
 //            LockSupport.unpark(Thread.currentThread());
             // 8：循环时间延长1毫秒
-            shortWait(1000000);
+            shortWait( 1000000);
 
         }
         System.out.println(Thread.currentThread().getName() + "跳出循环：count=" + count);
