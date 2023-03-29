@@ -30,4 +30,5 @@ public class RedisTest {
 //        redisTemplate.opsForStream().add("mystream", message);
         streamRedisUtil.addStream("mystream", message);
     }
+
 }

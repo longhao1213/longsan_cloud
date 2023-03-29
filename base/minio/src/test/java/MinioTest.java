@@ -93,8 +93,10 @@ public class MinioTest {
 
     @Test
     public void test6() {
-        minioUtils.removeBucket("test");
+        System.out.println(minioUtils.getPresignedObjectUrl("test", "吊车族1.rfa"));
     }
+
+
 
     public static void main(String[] args) {
         File file = new File("/Users/longhao/temp/test");

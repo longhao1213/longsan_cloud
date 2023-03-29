@@ -33,6 +33,16 @@ public class StreamRedisUtil {
 //    }
 
     /**
+     * 手动对消息ack
+     * @param stream
+     * @param group
+     * @param fieldId
+     */
+    public void ack(String stream, String group, String fieldId) {
+        redisTemplate.opsForStream().acknowledge(stream, group, fieldId);
+    }
+
+    /**
      * XADD 添加stream消息
      * @param key stream对应的key
      * @param message 要村粗的消息数据

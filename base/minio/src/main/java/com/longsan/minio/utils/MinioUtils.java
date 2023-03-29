@@ -51,10 +51,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.longsan.minio.config.MinioConfig.BUCKET_PARAM;
 
@@ -647,8 +650,34 @@ public class MinioUtils {
 
     private final MinioConfig minioConfig;
 
+    /**
+     * 生成文件路径
+     * @param bucketName
+     * @param fileName
+     * @return
+     */
     public String createFilePath(String bucketName ,String fileName) {
         return minioConfig.getEndpoint() + "/" + bucketName + "/" + fileName;
+    }
+
+    /**
+     * 生成文件直传地址
+     * @param bucketName
+     * @param storeKey
+     * @return
+     */
+    @SneakyThrows
+    public String presignedObjectUrl(String bucketName, String storeKey) {
+        Map<String, String> queryParams = new HashMap<>();
+//        queryParams.put("uploadId", uploadId);
+        String presignedObjectUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                .method(Method.PUT)
+                .bucket(bucketName)
+                .object(storeKey)
+                .expiry(1, TimeUnit.DAYS)
+                .extraQueryParams(queryParams)
+                .build());
+        return presignedObjectUrl;
     }
 
 
