@@ -14,6 +14,7 @@
         <module>juc-demo</module>
         <module>base/redis</module>
         <module>base/db-test</module>
+        <module>base/mybatis-generator-ui</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

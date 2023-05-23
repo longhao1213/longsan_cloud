@@ -1,5 +1,5 @@
 minio:
-  endpoint: http://127.0.0.1:9000
+  endpoint: http://127.0.0.1:9000/bim-boot/8e677925d954388c25b9a124d808bda9.jpg
   accessKey: admin
   secretKey: 12345678
   bucketName: test
