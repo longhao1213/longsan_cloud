@@ -28,8 +28,10 @@ https://archive.apache.org/dist/skywalking/java-agent/8.9.0/apache-skywalking-ja
 3. 创建对应的接口
 
 ### 5.配置vm参数
-```java
--javaagent:/Users/longhao/tools/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=skyWalking-demo -Dskywalking.collector.backend_service=127.0.0.1:11800
+```text
+-javaagent:/Users/longhao/tools/skywalking-agent/skywalking-agent.jar 
+        -Dskywalking.agent.service_name=skyWalking-demo 
+        -Dskywalking.collector.backend_service=127.0.0.1:11800
 ```
 
 ### 6.调用接口 在 `http://127.0.0.1:8088` 查看
