@@ -23,6 +23,10 @@ apache/skywalking-ui:8.9.1
 ### 4.下载skyWalking Agent
 https://archive.apache.org/dist/skywalking/java-agent/8.9.0/apache-skywalking-java-agent-8.9.0.tgz
 
+1. pom文件中引入相关依赖
+2. 创建logback.xml文件，并且配置skyWalking
+3. 创建对应的接口
+
 ### 5.配置vm参数
 ```java
 -javaagent:/Users/longhao/tools/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=skyWalking-demo -Dskywalking.collector.backend_service=127.0.0.1:11800
