@@ -16,6 +16,7 @@
         <module>base/db-test</module>
         <module>base/mybatis-generator-ui</module>
         <module>base/skyWalking-demo</module>
+        <module>moer-demo</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

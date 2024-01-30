@@ -1,9 +1,10 @@
 package com.longsan.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import lombok.Data;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 /**
  * <p>
@@ -16,6 +17,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/sysMenu")
 public class SysMenuController {
+
+    @GetMapping("/get")
+    public String testGet(String message) {
+        return message + "get";
+    }
+
+    @PostMapping("post")
+    public PostDo testPost(@RequestBody PostDo postDo) {
+        postDo.setName(postDo.getName() + "post");
+        TestList testList = postDo.getLists().get(0);
+        testList.setSex("bigSex");
+        postDo.getLists().set(0, testList);
+        return postDo;
+    }
+
+
+    @Data
+    static class PostDo{
+        private String name;
+        private Integer age;
+        private List<TestList> lists;
+    }
+
+    @Data
+    static class TestList{
+        private String sex;
+        private Integer big;
+    }
 
 }
 
