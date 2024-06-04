@@ -2,9 +2,6 @@ server:
   port: 8080
 spring:
   elasticsearch:
-#    rest:
-#      uris: http://127.0.0.1:9200
     uris: http://127.0.0.1:9200
-#elasticsearch:
-#  host: 127.0.0.1
-#  port: 9200
+    password: elastic
+    username: V2BPRJTshkotcat9M5hK
