@@ -28,14 +28,15 @@
         <dependency>
             <groupId>org.apache.skywalking</groupId>
             <artifactId>apm-toolkit-logback-1.x</artifactId>
-            <version>8.9.0</version>
+            <version>9.2.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.skywalking/apm-toolkit-trace -->
         <dependency>
             <groupId>org.apache.skywalking</groupId>
             <artifactId>apm-toolkit-trace</artifactId>
-            <version>8.9.0</version>
+            <version>9.2.0</version>
         </dependency>
+
 
     </dependencies>
 
