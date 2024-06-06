@@ -19,6 +19,7 @@
         <module>netty</module>
         <module>adminServer</module>
         <module>adminClient</module>
+        <module>security</module>
     </modules>
 
     <properties>
