@@ -24,26 +24,27 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.9</version>
+        <version>3.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.7.9</spring.boot.version>
+        <spring.boot.version>3.3.0</spring.boot.version>
         <mybatisplus.boot.starter.version>3.4.0</mybatisplus.boot.starter.version>
         <lombok.version>1.18.20</lombok.version>
-        <hutool.version>5.8.11</hutool.version>
+        <hutool.version>5.8.28</hutool.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <docker.image.prefix>longsan-cloud</docker.image.prefix>
-        <spring.cloud.version>2021.0.4</spring.cloud.version>
-        <alibaba.cloud.version>2021.0.4.0</alibaba.cloud.version>
+        <spring.cloud.version>2023.0.1</spring.cloud.version>
+        <alibaba.cloud.version>2023.0.1.0</alibaba.cloud.version>
         <commons.lang3.version>3.11</commons.lang3.version>
         <knife4j.version>4.0.0</knife4j.version>
         <springdoc.version>1.6.14</springdoc.version>
+        <httpclient5.version>5.3.1</httpclient5.version>
     </properties>
 
     <dependencies>
@@ -126,34 +127,47 @@
             </dependency>
 
             <!--验证码kaptcha依赖包-->
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>kaptcha-spring-boot-starter</artifactId>
-                <version>1.1.0</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.baomidou</groupId>-->
+<!--                <artifactId>kaptcha-spring-boot-starter</artifactId>-->
+<!--                <version>1.1.0</version>-->
+<!--            </dependency>-->
 
             <!-- OSS各个项目单独加依赖，根据需要进行添加-->
-            <dependency>
-                <groupId>com.aliyun.oss</groupId>
-                <artifactId>aliyun-sdk-oss</artifactId>
-                <version>3.10.2</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.aliyun.oss</groupId>-->
+<!--                <artifactId>aliyun-sdk-oss</artifactId>-->
+<!--                <version>3.10.2</version>-->
+<!--            </dependency>-->
 
 
             <!-- JWT相关 -->
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>0.7.0</version>
-            </dependency>
+<!--            &lt;!&ndash; JJWT API &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>io.jsonwebtoken</groupId>-->
+<!--                <artifactId>jjwt-api</artifactId>-->
+<!--                <version>0.11.5</version>-->
+<!--            </dependency>-->
+<!--            &lt;!&ndash; JJWT Implementation &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>io.jsonwebtoken</groupId>-->
+<!--                <artifactId>jjwt-impl</artifactId>-->
+<!--                <version>0.11.5</version>-->
+<!--            </dependency>-->
+<!--            &lt;!&ndash; JJWT Jackson JSON Processor &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>io.jsonwebtoken</groupId>-->
+<!--                <artifactId>jjwt-jackson</artifactId>-->
+<!--                <version>0.11.5</version>-->
+<!--            </dependency>-->
 
 
-            <!--分布式锁-->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson</artifactId>
-                <version>3.15.3</version>
-            </dependency>
+<!--            &lt;!&ndash;分布式锁&ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>org.redisson</groupId>-->
+<!--                <artifactId>redisson</artifactId>-->
+<!--                <version>3.31.0</version>-->
+<!--            </dependency>-->
             <dependency>
                 <artifactId>mysql-connector-java</artifactId>
                 <groupId>mysql</groupId>
@@ -180,7 +194,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <fork>true</fork>
+<!--                    <fork>true</fork>-->
                     <addResources>true</addResources>
                 </configuration>
             </plugin>

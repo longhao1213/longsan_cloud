@@ -2,10 +2,10 @@ package com.redis.test;
 
 import com.lh.redis.RedisApplication;
 import com.lh.redis.config.StreamRedisUtil;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

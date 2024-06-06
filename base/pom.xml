@@ -14,7 +14,6 @@
     <modules>
         <module>nacos</module>
         <module>mybatis</module>
-        <module>security</module>
         <module>elasticsearch</module>
         <module>minio</module>
         <module>netty</module>

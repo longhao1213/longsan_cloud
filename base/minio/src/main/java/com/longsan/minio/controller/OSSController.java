@@ -3,31 +3,25 @@ package com.longsan.minio.controller;
 import com.longsan.minio.config.MinioConfig;
 import com.longsan.minio.utils.MinioUtils;
 import io.minio.ObjectWriteResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 
 @Slf4j
 @RestController
 @RequestMapping("/oss")
+@RequiredArgsConstructor
 public class OSSController {
 
-    @Autowired
-    private MinioUtils minioUtils;
+    private final MinioUtils minioUtils;
     
-    @Autowired
-    private MinioConfig minioConfig;
+    private final MinioConfig minioConfig;
     
     /**
      * 文件上传
